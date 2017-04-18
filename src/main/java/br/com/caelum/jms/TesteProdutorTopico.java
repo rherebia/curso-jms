@@ -1,6 +1,5 @@
 package br.com.caelum.jms;
 
-import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.jms.Connection;
@@ -8,19 +7,17 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
-import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.naming.InitialContext;
 
-public class TesteBrowser {
+public class TesteProdutorTopico {
 
 	public static void main(String[] args) throws Exception {
 		Properties properties = new Properties();
 		properties.setProperty("java.naming.factory.initial", "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
 
 		properties.setProperty("java.naming.provider.url", "tcp://localhost:61616");
-		properties.setProperty("queue.financeiro", "fila.financeiro");
+		properties.setProperty("topic.loja", "topico.loja");
 
 		InitialContext context = new InitialContext(properties);
 		
@@ -30,17 +27,13 @@ public class TesteBrowser {
 		
 		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		
-		Destination fila = (Destination) context.lookup("financeiro");
+		Destination topico = (Destination) context.lookup("loja");
 		
-		QueueBrowser browser = session.createBrowser((Queue) fila);
+		MessageProducer producer = session.createProducer(topico);
 		
-		Enumeration enumeration = browser.getEnumeration();
+		Message message = session.createTextMessage("<pedido><id>123</id></pedido>");
 		
-		while (enumeration.hasMoreElements()) {
-			Message message = (Message) enumeration.nextElement();
-			
-			System.out.println(message);
-		}
+		producer.send(message);
 		
 		session.close();
 		connection.close();

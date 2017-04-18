@@ -13,18 +13,19 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 
-public class TesteConsumidor {
+public class TesteConsumidorTopicoComercial {
 
 	public static void main(String[] args) throws Exception {
 		InitialContext context = new InitialContext();
 		ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
 		Connection connection = factory.createConnection();
+		connection.setClientID("comercial");
 		connection.start();
 		
 		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		
-		Destination fila = (Destination) context.lookup("financeiro");
-		MessageConsumer consumer = session.createConsumer(fila);
+		Destination topico = (Destination) context.lookup("loja");
+		MessageConsumer consumer = session.createConsumer(topico);
 		
 		consumer.setMessageListener(new MessageListener() {
 			

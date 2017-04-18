@@ -1,5 +1,6 @@
 package br.com.caelum.jms;
 
+import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.jms.Connection;
@@ -7,10 +8,12 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.naming.InitialContext;
 
-public class TesteProdutor {
+public class TesteBrowserFila {
 
 	public static void main(String[] args) throws Exception {
 		Properties properties = new Properties();
@@ -29,11 +32,15 @@ public class TesteProdutor {
 		
 		Destination fila = (Destination) context.lookup("financeiro");
 		
-		MessageProducer producer = session.createProducer(fila);
+		QueueBrowser browser = session.createBrowser((Queue) fila);
 		
-		Message message = session.createTextMessage("<pedido><id>123</id></pedido>");
+		Enumeration enumeration = browser.getEnumeration();
 		
-		producer.send(message);
+		while (enumeration.hasMoreElements()) {
+			Message message = (Message) enumeration.nextElement();
+			
+			System.out.println(message);
+		}
 		
 		session.close();
 		connection.close();
